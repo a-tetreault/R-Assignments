@@ -1,0 +1,62 @@
+---
+title: 'Practice Problems: Set 3'
+author: "Anthony Tetreault"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Write a function that loops over each item in the input and prints it out on a new line. Specify the default input of the integers from 1 to 5, written 1:5.
+
+```{r}
+loopz <- function(x=1:5) {
+  for (i in seq_along(x)){
+    print(i)
+  }
+}
+loopz()
+```
+
+## Rewrite rescale01 from second ungraded lab to check for whether the inputs are numeric and stop if they aren’t with the message “inputs must all be numeric”.
+```{r error=TRUE}
+rescale01 <- function(x) { 
+  if (!is.numeric(x)) {
+    stop("Input must be numeric")
+  }
+  rng <- range(x, na.rm = TRUE, finite =TRUE) 
+  (x- rng[1]) / (rng[2] - rng[1])
+
+}
+x <- c(8, 20, 14, 26, 34)
+rescale01(x)
+y <- c("23", 34, 55, 42, 24)
+rescale01(y)
+```
+
+## What will the following code return and why? Be specific and walk through the input values and how they change or don’t change at each step until you get to what the function returns
+
+```{r}
+multiple_conditions <- function(x, y){
+  if(x < y){
+    x <- x*2
+    }
+  if(y > x) {
+    output <- y/2
+    }
+  else{
+    output <- y
+  }
+}
+multiple_conditions(2, 6)
+multiple_conditions(2, 3.2)
+multiple_conditions(2, 1)
+```
+
+- Nothing can be returned because in each conditional, the result is assigned to a variable, and nowhere does it call either variable.
+  + multiple_conditions(2,6) - for our input (x < y) we go with statement 1. This then assigns x*2 to variable x and stored, not returned.
+  + multiple_conditions(2,3.2) - same as previous, (x < y), therefore statement 1, therefore x*2 assigned to x and stored, not returned.
+  + multiple_conditions(2,1) - although we do not meet our first statement's conditional, the second statement's condition is the same, just reversed. So, we go to the else of our second conditional and our output is assigned to y, storing it, not returning it.
+

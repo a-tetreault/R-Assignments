@@ -1,0 +1,72 @@
+---
+title: 'Pratice Problems: Set 2'
+author: "Anthony Tetreault"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Read and understand the three given functions w/ trivial names and rename them
+```{r}
+has_prefix <- function(string, prefix) {
+  substr(string, 1, nchar(prefix)) == prefix
+}
+
+remove_last <- function(x) {
+  if (length(x) <= 1) return(NULL)
+  x[-length(x)]
+}
+
+replicator <- function(x, y) {
+  rep(y, length.out = length(x))
+}
+```
+### Write a function that prints “input must be numeric” if the function input is not numeric and returns two times the number otherwise.
+```{r}
+must_be_num <- function(x) {
+  if (is.numeric(x)) {
+    rep(x, 2)
+  } else {
+    print("Input must be numeric.")
+  }
+}
+```
+### Fizzbuzz
+```{r}
+fizzbuzz <- function(x) {
+  if (x %% 3 == 0 && x %% 5 == 0) {
+    print("fizzbuzz")
+  } else if (x %% 3 == 0) {
+    print("fizz")
+  } else if (x %% 5 == 0) {
+    print("buzz")
+  } else {
+    print(x)
+  }
+}
+```
+### Use the cut() function to simplify the given set of nested if-else statements.
+```{r eval=FALSE}
+if (temp <= 0) {
+  "freezing"
+  } else if (temp <= 10) {
+  "cold"
+  } else if (temp <= 20) {
+  "cool"
+  } else if (temp <= 30) {
+  "warm"
+  } else {
+  "hot"
+}
+```
+### Fixed
+```{r}
+feels <- function(x) {
+  cut(x, breaks = c(-Inf, 0, 10, 20, 30, Inf), 
+      labels = c("freezing", "cold", "cool", "warm", "hot"), 
+      right = FALSE)
+}
+```
+

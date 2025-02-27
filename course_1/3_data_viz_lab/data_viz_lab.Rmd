@@ -1,0 +1,57 @@
+---
+title: "Data Visualization Assignment"
+author: "Anthony Tetreault"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+# I know the questions say "use mtcars," but the variables don't line up with the graphs. I used the "mpg" dataset.
+## Recreate the graphs from the assignment
+### Graph 1
+```{r}
+ggplot(data = mpg, mapping=aes(x=displ, y=hwy)) +
+    geom_point() +
+    geom_smooth(se = FALSE)
+```
+
+### Graph 2
+
+```{r}
+ggplot(data = mpg, mapping=aes(x=displ, y=hwy)) +
+    geom_point(aes(color=drv)) +
+    geom_smooth(se = FALSE)
+```
+
+### Graph 3
+
+```{r}
+ggplot(data = mpg, mapping=aes(x=displ, y=hwy)) +
+    geom_point(aes(color=drv)) +
+    geom_smooth(aes(linetype=drv), se = FALSE)
+```
+
+### Graph 4
+
+```{r}
+ggplot(data = mpg, mapping = aes(x=cty, y=hwy, color=class)) +
+    geom_jitter()
+```
+
+### Graph 5
+
+```{r}
+ggplot(mpg, mapping = aes(x=hwy, y=cyl, color="orange"), show.legend = FALSE) +
+    geom_point(shape=17) +
+    facet_wrap(~class) +
+    theme(legend.position="none")
+```
+
+#### SessionInfo()
+```{r}
+sessionInfo()
+```
+

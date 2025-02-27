@@ -1,0 +1,65 @@
+---
+title: "Rmd Assignment"
+author: "Anthony Tetreault"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# About Me
+
+## Current Fave Artists w/ Albums
+
+* **Aesop Rock**
+  + _Impossible Kid_
+  + *Garbology*
+* __La Luz__
+  + *News of the Universe*
+  + _Floating Features_
+
+## 5 States I Have Lived In
+### __Ordered__ by _preference_
+
+1. **Oregon**
+1. South Carolina
+1. Connecticut
+1. New York
+1. *Florida*
+
+## Echo makes it look like magic!
+
+```{r echo=FALSE}
+x <- 6
+y <- 7
+x*y
+```
+
+## Tippecanoe and Tyler Too
+
+1st year in   | Office        | Name
+------------- | ------------- | ----------------------
+1841          | President     | William Henry Harrison
+1841          | President     | John Tyler
+1976          | DCI           | George H.W. Bush
+1981          | V. President  | George H.W. Bush
+1989          | President     | George H.W. Bush
+2019          | Representative| Rashida Tlaib
+
+## A Plot
+
+```{r}
+ggplot(mpg, mapping=aes(displ, hwy, colour = class)) + geom_point() +  
+  xlab("Engine Displacement") + ylab("Highway MPG")
+```
+
+
+#### Session Info
+```{r}
+sessionInfo()
+```
+

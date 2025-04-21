@@ -1,0 +1,106 @@
+---
+title: "Tidying Data Lab"
+author: "Anthony Tetreault"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+1.  The built in billboard dataset is not tidy. Describe why it is not tidy and then tidy the dataset.
+
+```{r}
+# This dataset is not tidy because the columns are values of a variable, weeks, not each variable has its own column.
+billboard %>% 
+    pivot_longer(
+        cols = starts_with("wk"),
+        names_to = "week",
+        names_prefix = "wk",
+        names_transform = list(week = as.integer),
+        values_drop_na = TRUE
+    ) %>% 
+        mutate(date = date.entered + weeks(week)) %>% 
+            arrange(artist, track, week)
+```
+
+2.  Tidy the "fish_encounters" dataset of fish spotting by monitoring stations. Make the NA into 0 using the option "values_fill = list(seen = 0)"
+
+```{r}
+fish_encounters %>% 
+    pivot_wider(
+        names_from = "station",
+        values_from = "seen",
+        values_fill = list(seen = 0)
+    )
+```
+
+3.  Import the flowers1 dataset. Tidy and pivot the data. Hint: use "read_csv2()" to read in the dataset 
+
+```{r}
+flowers1 <- read_csv2("./flowers1.csv")
+
+flowers1 %>% 
+    pivot_wider(
+        names_from = "Variable",
+        values_from = "Value"
+    )
+```
+
+4.  Import the flowers2 dataset. Tidy the dataset by turning the one column into 3 separate columns
+
+```{r}
+flowers2 <- read_csv2("./flowers2.csv")
+
+flowers2 %>% 
+    separate_wider_delim(
+        cols = "Flowers/Intensity",
+        delim = "/",
+        names = c("Flowers", "Intensity")
+    ) %>% select(Time, Flowers, Intensity)
+```
+
+5.  In the following dataset, turn the implicit missing values to explicit 
+
+```{r}
+output <- tibble(
+      treatment   = c("a", "b", "a", "c", "b"),
+      gender   = factor(c("M", "F", "F", "M", "M"), levels = c("M", "F", "O")),
+      return = c(1.5, 0.75,  0.5,  1.8,  NA)
+    )
+output %>% 
+    complete(treatment, gender)
+```
+
+6.  Import the weather dataset as weather. Use "pivot_longer()" to put the days all in one column, then use "pivot_wider" to separate tmax and tmin into separate columns. Print the summary of the final resulting dataset 
+
+```{r}
+weather <- read_csv("./weather.csv")
+
+weather %>% 
+    pivot_longer(
+        cols = starts_with("d"),
+        names_to = "day",
+        names_prefix = "d",
+        values_drop_na = TRUE
+    ) %>% 
+        pivot_wider(
+            names_from = "element",
+            values_from = "value"
+        ) %>% 
+            summary()
+```
+
+7.  Load the built in "anscombe" data frame and use "pivot_longer()" to separate all the x and y columns and categorize them into 4 sets.
+
+```{r}
+anscombe %>% 
+     pivot_longer( 
+         cols = starts_with(c("x","y")),
+         names_to = c(".value", "set"),
+         names_pattern = "(.)(.)"
+     )
+```
+

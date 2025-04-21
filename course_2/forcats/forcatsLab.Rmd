@@ -1,0 +1,76 @@
+---
+title: "forcats Lab"
+author: "Anthony Tetreault"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+#### Question 1.  From the "forcats" library load gss_cat data. Explore the distribution of rincome (reported income). What makes the default bar chart hard to understand? How could you improve the plot?
+```{r}
+gss_cat %>% 
+    ggplot(aes(rincome)) +
+    geom_bar()
+# adjusting the labels would really help the readability of the bottom level. We could also reorder the x axis to go from lowest to highest.
+# honestly, this can all be done with coord_flip() to get a horizontal bar chart, as well, if we have to do a bar chart.
+gss_cat %>% 
+    ggplot(aes(rincome)) +
+    geom_bar() +
+    coord_flip()
+# there are plenty more things we could do with this, but this graph accurately shows the distribution of rincome by itself.
+```
+
+#### Question 2.  What is the most common religion? What is the most common partyid?
+```{r}
+gss_cat %>% count(relig) # Protestant n = 10846
+
+gss_cat %>% count(party) # Independent n = 4119
+```
+
+#### Question 3.  Which relig does denom (denomination) apply to? How can you find out with a table? How can you find out with a visualisation?
+```{r}
+# via a table
+gss_cat %>% 
+    select(relig,denom) %>% 
+    filter(!is.na(denom)) %>% filter(denom != "Not applicable") %>% 
+    count(relig) # shows a table with all religions that have a denomination that is !na or "Not applicable". I guess I could have mutated the table to make all Not applicable values = to NA or used factors to do that.
+
+# via a graph
+gss_cat %>% 
+    ggplot(aes(relig, color = factor(denom))) + 
+    geom_bar() # only in protestant does any factor show up other than "No Answer" or "Don't Know"
+
+```
+
+#### Question 4.  How have the proportions of people identifying as Democrat, Republican, and Independent changed over time? Plot a suitable chart.
+```{r}
+gss_cat %>% # collapse it into rep ind and dem. 
+    mutate(partyid = fct_collapse(partyid,
+                                  other = c("No answer", "Don't know", "Other party"),
+                                  rep = c("Strong republican", "Not str republican"),
+                                  ind = c("Ind,near rep", "Independent", "Ind,near dem"),
+                                  dem = c("Not str democrat", "Strong democrat")
+    )) %>% 
+    group_by(year, partyid) %>% # group by year # create column for count of each party affiliation.
+    summarize(count = n()) %>% # add a count for each partyid per year
+    mutate(proportion = count / sum(count)) %>% # add a proportion column using count
+    ggplot(aes(year, proportion, color = partyid)) + # plot year vs proportion per partyid (color)
+    geom_line() # line graph for time
+```
+
+#### Question 5.  Collapse "rincome" into smaller set of categories?
+```{r}
+gss_cat %>% 
+    mutate(rincome = fct_collapse(rincome, # I am creating four separate income groupings and an Other category to capture all string answers
+                                  Other =       c("No answer", "Don't know", "Refused", "Not applicable"),
+                                  "$20,000+" =  c("$25000 or more", "$20000 - 24999"),
+                                  "$10,000 - $19,999"   = c("$15000 - 19999", "$10000 - 14999"),
+                                  "$5,000 - $9,999"     = c("$8000 to 9999", "$7000 to 7999",  "$6000 to 6999", "$5000 to 5999"),
+                                  "$0 - $4999"           = c("$4000 to 4999",  "$3000 to 3999",  "$1000 to 2999",  "Lt $1000"))) %>% 
+   count(rincome)
+```
+

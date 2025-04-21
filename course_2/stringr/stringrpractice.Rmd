@@ -1,0 +1,115 @@
+---
+title: "Untitled"
+author: "Anthony Tetreault"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ISLR)
+```
+
+1.  How would you write the following expression? Use writeLines() to see the raw result.
+She said: "Let's all go!" \never mind! I said "I don't want to."
+
+```{r include = FALSE}
+writeLines("She said: \"Let's all go!\" \\never mind! I said \"I don't want to.\"")
+```
+
+2.  Use str_trim() and str_squish() to replace the string: 
+"   Help me to      get rid    of extra spaces?      "
+```{r}
+x <- "   Help me to      get rid    of extra spaces?      "
+# with the following strings: 
+
+# "Help me to      get rid    of extra spaces?      "
+str_trim(x, side = "left")
+```
+
+
+```{r}
+# "   Help me to      get rid    of extra spaces?"
+str_trim(x, side = "right")
+```
+
+
+```{r}
+# "Help me to      get rid    of extra spaces?"
+str_trim(x)
+```
+
+
+```{r}
+# "Help me to get rid of extra spaces?"
+str_squish(x)
+```
+
+3.  Using the words provided in stringr::words, create regular expressions that find all words that:
+```{r}
+# a. Start with "y"
+str_view(words, "^y.*")
+```
+
+```{r}
+# b. End with "x"
+str_view(words, ".*x$")
+```
+
+```{r}
+# c. End with "ed", but not with "eed"
+str_view(words, "^.*[^e]ed$")
+```
+
+```{r}
+# d. Start or end with "x"
+str_view(words, "(^x)|(x$)")
+```
+
+```{r}
+# e. Contains three or more vowels in a row
+str_view(words, "[aeiou]{3,}")
+```
+
+```{r}
+# f. Starts and ends with the same character
+str_view(words, "^(.).*\\1$")
+```
+
+```{r}
+# g. Contains at least 4 of the 5 vowels
+vowel80pct <- c("^(?:(?=.*e)(?=.*i)(?=.*o)(?=.*u)|(?=.*a)(?=.*i)(?=.*o)(?=.*u)|(?=.*a)(?=.*e)(?=.*o)(?=.*u)|(?=.*a)(?=.*e)(?=.*i)(?=.*u)|(?=.*a)(?=.*e)(?=.*i)(?=.*o)).*$")
+str_view(words, vowel80pct)
+
+```
+
+4.   Using the sentences provided in stringr::sentences, modify the regex so it no longer picks up the word flickered as a color (which was the case in the lecture video).
+```{r}
+colors <- c("^red", "orange", "yellow", "green", "blue", "purple$")
+color_match <- str_c(colors, collapse = "|")
+has_color <- str_subset(sentences, color_match)
+matches <- str_extract(has_color, color_match)
+more <- sentences[str_count(sentences, color_match) == 1]
+# a.  Show all the sentences that contain at least one color with the word highlighted using str_view_all()
+str_view(more, color_match)
+# b.  Use str_extract_all() to produce an array with the colors that appear multiple times in a sentence.
+str_extract_all(more, color_match, simplify = TRUE)
+
+```
+
+5.  Load the ISLR package. Then take names <- row.names(College).
+
+```{r}
+names <- row.names(College)
+# a. Show the first twenty rows that result if you split Names at each space into 3 parts
+names %>% 
+    str_split(boundary("word"), 3, simplify = TRUE) %>% 
+    head(20)
+# b. Do they same by splitting the first 20 rows on every word boundary.
+names %>% 
+    str_split(boundary("word"), simplify = TRUE) %>% 
+    head(20)
+```
+      
+      

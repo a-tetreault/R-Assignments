@@ -1,0 +1,135 @@
+---
+title: "String Manipulation and Regular Expressions Assignment"
+author: ''
+always_allow_html: true
+output: pdf_document
+---
+##### Assignment Instructions
+
+Complete all questions below. After completing the assignment, knit your document, and download both your .Rmd and knitted output. Upload your files for peer review. 
+
+For each response, include comments detailing your response and what each line does. Ensure you test your functions with sufficient test cases to identify and correct any potential bugs.
+
+##### Required Libraries
+
+Load the stringr library
+
+```{r libraries}
+library(tidyverse)
+```
+
+##### Question 1.
+
+Use str_c to put `(` before the area codes followed by `)` and a space followed by the phone number. 
+
+```{r question-1-response}
+
+### Answer should be of the form "(703) 5551212" "(863) 1234567" "(404) 7891234" "(202) 4799747"
+area_codes <- c(703, 863, 404, 202)
+phone_nums <- c(5551212, 1234567, 7891234, 4799747)
+area_codes <- str_c("(", area_codes, ")") # format area codes (xxx)
+comb <- str_c(area_codes, phone_nums, sep = " ") # combine area codes and phone numbers w/ " "
+print(comb)
+```
+
+##### Question 2.
+
+Create a function that receives a single word as an input. Use str_length() and str_sub() to extract the middle character from the string. What will you do if the string has an even number of characters? Test your function on the strings “hamburger” and “hotdog”
+
+```{r quetsion-2-response}
+mid_char <- function (s) {
+    slen <- str_length(s) # get length
+    middle_index <- slen / 2 # find middle
+    if(slen %% 2 == 0) { # if even length
+        # subset string to extract two middle characters
+        middle_char <- str_sub(s, middle_index, middle_index + 1)
+    } else { # if odd length
+        middle_index <- ceiling(middle_index) # round index for middle char
+        middle_char <- str_sub(s, middle_index, middle_index) # subset str for middle char
+    }
+    return(middle_char)
+}
+```
+
+##### Question 3. 
+
+How would you match the sequence "’\? Note this is a double quote, single quote, backslash and question mark. Build it up one piece at a time. Use it to identify that sequence contained in s2 below.
+
+```{r question-3-response}
+
+s <- "\"'\\?"
+s2 <- str_c("some stuff",s,"more!")
+
+str_view(s2, "(\"'\\\\\\?)")
+```
+
+##### Question 4. 
+
+Using the words provided in stringr::words, create regular expressions that find all words that:
+
+```{r}
+# a.  End with "ing" or "ise"
+words %>% str_view(".+i(ng|se)$")
+```
+
+
+```{r}
+# b.  Do not follow the rule "i before e except after c"
+words %>% str_view(".*[^c].*ei|.*[c].*ie")
+```
+
+
+```{r}
+# c.  Begin with at least two vowels and end with at least two consonants
+words %>% str_view("^[aeiou]{2,}.*[^aeiou]{2,}")
+```
+
+
+```{r}
+# d.  Contain a repeated pair of letters (e.g. "church" contains "ch" twice)
+words %>% str_view(".*(..).*\\1.*")
+```
+
+
+```{r}
+# e.  Contain one letter other than e that is repeated in at least three places (e.g. “appropriate” contains three “p”s.)
+words %>% str_view(".*([^e])(.*\\1.*){2,}")
+```
+
+##### Question 5. 
+
+Using the sentences provided in stringr::sentences, find all words that come after a “number” like “one”, “two”, … “twelve”. Pull out both the number and the word.
+
+```{r question-5-response}
+# create number vector
+nums <- c("one","two","three","four","five","six","seven","eight","nine","ten","eleven","twelve","[0-9]+?")
+# create regex for numbers
+numpat <- str_c("\\b(", str_c(nums, collapse = "|"), ")\\b")
+# create tibble from sentences
+sen1 <- tibble(sentence = sentences)
+res <- sen1 %>% 
+    # make number and word columns
+    mutate(
+        number = str_extract(sentence,numpat), # extract number
+        word = str_extract(sentence, str_c(numpat, "\\s(\\w+)")) %>% str_extract("\\w+") # extract word after number
+    ) %>% 
+    filter(!is.na(number)) %>%  filter(!is.na(word)) # filter NAs
+print(res)
+```
+
+##### Question 6. 
+
+Using the sentences provided in stringr::sentences, view all sentences that contain the word “good” or the word “bad”. Get the sentence numbers where those words occur. Use str_replace_all() to replace the word “bad” with the word “horrible” and the word “good” with the word “great”. Look at the sentence numbers you found before to verify the words were replaced correctly.
+
+```{r question-6-response}
+# Find index of line for each sentence with good or bad
+str_indices <- sentences %>% 
+    str_detect("\\s(good|bad)\\s") %>%
+    which()
+# replace all goods wth greats and all bads with horribles
+new_sentences <- sentences %>% 
+    str_replace_all("good", "great") %>% 
+    str_replace_all("bad", "horrible")
+# check your work
+new_sentences[str_indices]
+```

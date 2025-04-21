@@ -1,0 +1,111 @@
+---
+title: "Practice Tidying Data Lab"
+author: "Anthony Tetreault"
+date: '`r Sys.Date()`'
+output: pdf_document
+---
+
+##### Libraries
+Load the tidyverse library
+```{r}
+library(tidyverse)
+```
+
+##### Question 1. 
+The following built-in datasets are not tidy. For each one, describe why it is not tidy, write out what the first five entries would look like once it is in a tidy format, and then tidy the dataset 
+
+a.relig_income
+b.billboard
+c.us_rent_income
+
+```{r}
+# relig_income
+# This dataset is not tidy because the columns are values of a variable, income, not each variable has its own column.
+relig_income %>% 
+    pivot_longer(
+        cols = c(`<$10k`, `$10-20k`, `$20-30k`, 
+                 `$30-40k`, `$40-50k`, `$50-75k`, 
+                 `$75-100k`, `$100-150k`, `>150k`, 
+                 `Don't know/refused`),
+        names_to = "income",
+        values_to = "count"
+    )
+
+# billboard
+# This dataset is not tidy because the columns are values of a variable, weeks, not each variable has its own column.
+billboard %>% 
+    pivot_longer(
+        cols = starts_with("wk"),
+        names_to = "week",
+        names_prefix = "wk",
+        names_transform = list(week = as.integer),
+        values_drop_na = TRUE
+    ) %>% 
+        mutate(date = date.entered + weeks(week)) %>% 
+            arrange(artist, track, week)
+
+# us_rent_income
+# This dataset is not tidy because the column variable contains multiple variables in it (income, rent) 
+# and each variable should have its own column.
+us_rent_income %>% 
+    pivot_wider(
+        id_cols = c("GEOID", "NAME"),
+        names_from = "variable",
+        values_from = c("estimate", "moe")
+    )
+
+```
+
+##### Question 2.
+2.Use "pivot_longer" to tidy the built-in table4b dataset
+
+```{r question-2-response}
+table4b %>% 
+    pivot_longer(
+        cols = c(`1999`, `2000`),
+        names_to = "year",
+        values_to = "population"
+    )
+
+```
+
+##### Question 3. 
+3.Import and tidy the monkeymen dataset. The cell values represent identification accuracy of some objects (in percent of 20 trials).
+
+```{r question-3-response}
+monkeymen <- read_csv("./monkeymem.csv")
+
+monkeymen %>% 
+    pivot_longer( # Collect years into one column, so all columns have one variable
+        cols = starts_with("Week"),
+        names_to = "Week",
+        names_prefix = "Week",
+        values_to = "Percent"
+    )
+
+```
+
+##### Question 4. 
+4. As explained in the lecture video load and tidy the built in world_bank_pop data frame
+
+```{r question-4-response}
+world_bank_pop %>% 
+    pivot_longer( # Collect years into one column
+        cols = `2000`:`2017`,
+        names_to = "year",
+        values_to = "value",
+        values_drop_na = TRUE
+    ) %>% 
+        separate_wider_regex( # Expand indicator column to capture area and variable
+            cols = indicator,
+            patterns = c("^.*[:punct:]", # SP.
+                         area = ".*", # URB
+                         "[:punct:]", # .
+                         variable = ".*$") # TOTL/GROW
+        ) %>% 
+            pivot_wider( # Expand variable column to TOTL and GROW columns
+                names_from = "variable",
+                values_from = "value"
+            )
+
+```

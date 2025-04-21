@@ -1,0 +1,101 @@
+---
+title: "Practice Tidying Data"
+author: "Anthony Tetreault"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+# Tidying Data
+
+1.  In the following data set, turn the implicit missing values to explicit.
+
+```{r}
+output <- tibble(
+      treatment   = c("a", "b", "a", "c", "b"),
+      gender   = factor(c("M", "F", "F", "M", "M"), levels = c("M", "F", "O")),
+      return = c(1.5, 0.75,  0.5,  1.8,  NA)
+    )
+output %>% 
+    complete(treatment, gender)
+```
+
+2.  Read the dataset available at "https://raw.githubusercontent.com/JaneWall/data_STAT412612/master/weather.csv" as weather. 
+
+Use "pivot_longer()" to to put the days all in one column, then use "pivot_wider" to separate tmax and tmin into separate columns. Print the summary of the final resulting dataset.
+
+```{r}
+weather <- read_csv("./weather.csv")
+
+weather %>% 
+    pivot_longer(
+        cols = starts_with("d"),
+        names_to = "day",
+        names_prefix = "d",
+        values_drop_na = TRUE
+    ) %>% 
+        pivot_wider(
+            names_from = "element",
+            values_from = "value"
+        ) %>% 
+            summary()
+```
+
+3.  Tidy the billboard dataset (built-in).
+
+      a.  First gather up all the week entries into a row for each week for each song (where there is an entry)
+      b.  Then, convert the week variable to a number and figure out the date corresponding to each week on the chart
+      c.  Sort the data by artist, track and week. Here are what your first entries should be (formatting can be different)
+
+```{r}
+billboard %>% 
+    pivot_longer(
+        cols = starts_with("wk"),
+        names_to = "week",
+        names_prefix = "wk",
+        names_transform = list(week = as.integer),
+        values_drop_na = TRUE
+    ) %>% 
+        mutate(date = date.entered + weeks(week)) %>% 
+            arrange(artist, track, week)
+```
+
+
+4.  Load the built in "anscombe" data frame and use "pivot_longer()" to separate all the x and y columns and categorize them into 4 sets.
+
+```{r}
+anscombe %>% 
+     pivot_longer( 
+         cols = starts_with(c("x","y")),
+         names_to = c(".value", "set"),
+         names_pattern = "(.)(.)"
+     )
+```
+
+5.  As explained in the video load and tidy the built in world_bank_pop data frame.
+
+```{r}
+world_bank_pop %>% 
+    pivot_longer(
+        cols = `2000`:`2017`,
+        names_to = "year",
+        values_to = "value",
+        values_drop_na = TRUE
+    ) %>% 
+        separate_wider_regex(
+            cols = indicator,
+            patterns = c("^.*[:punct:]", 
+                         area = ".*", 
+                         "[:punct:]", 
+                         variable = ".*$")
+        ) %>% 
+            pivot_wider(
+                names_from = "variable",
+                values_from = "value"
+            )
+```
+
